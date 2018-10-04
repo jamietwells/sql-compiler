@@ -1,5 +1,7 @@
 namespace Library
 
-module Say =
-    let hello name =
-        printfn "Hello %s" name
+type CompilationResult = { Statements: string[] }
+
+module Compiler =
+    let compile sql =
+         { Statements = Array.empty } 

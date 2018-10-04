@@ -1,8 +1,10 @@
 ﻿module Tests
 
-open System
 open Xunit
 
+let compile =
+    Library.Compiler.compile "SELECT 1"
+
 [<Fact>]
-let ``My test`` () =
-    Assert.True(true)
+let ``SELECT 1 returns a single statement`` () =
+    Assert.Single(compile.Statements)
