@@ -1,8 +1,9 @@
 namespace Library
 
-type Statement = { Name: string }
+type ConstantValue = { Value: string }
+type Statement = { Name: string; ColumnList: ConstantValue[] }
 type CompilationResult = { Statements: Statement[] }
 
 module Compiler =
     let compile sql =
-         { Statements = Array.create 1 { Name = "SELECT" } } 
+         { Statements = Array.create 1 { Name = "SELECT"; ColumnList = Array.create 1 { Value = "1" } } } 
