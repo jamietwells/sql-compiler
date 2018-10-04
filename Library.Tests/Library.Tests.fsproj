@@ -6,7 +6,7 @@
     <ProjectReference Include="..\Library\Library.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tests.fs" />
+    <Compile Include="CompilerSpec.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />

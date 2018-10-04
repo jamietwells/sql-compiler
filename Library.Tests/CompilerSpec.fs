@@ -1,11 +1,12 @@
 ﻿module Tests
 
 open Xunit
+open Library
 
 let compile =
-    Library.Compiler.compile "SELECT 1"
+    SqlCompiler.compile "SELECT 1"
 
-let firstStatement (result: Library.CompilationResult) =
+let firstStatement (result: CompilationResult) =
     result.Statements.[0]
 
 let getFirstStatement =
