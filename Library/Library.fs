@@ -1,7 +1,8 @@
 namespace Library
 
-type CompilationResult = { Statements: string[] }
+type Statement = { Name: string }
+type CompilationResult = { Statements: Statement[] }
 
 module Compiler =
     let compile sql =
-         { Statements = Array.empty } 
+         { Statements = Array.create 1 { Name = "SELECT" } } 
