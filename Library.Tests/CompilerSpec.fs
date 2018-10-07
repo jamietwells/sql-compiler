@@ -48,10 +48,10 @@ let ``SELECT 1 has a single column in the ColumnList with value 1`` () =
     |> clauseColumns
     |> CheckEquality [|"1"|]
 
-// [<Fact>]
-// let ``SELECT 1, 2 has a two columns in ColumnList`` () =
-//     compile "SELECT 1, 2"
-//     |> firstStatement
-//     |> clauseColumns
-//     |> Array.length
-//     |> CheckEquality 2
+[<Fact>]
+let ``SELECT 1, 2 has a two columns in ColumnList`` () =
+    compile "SELECT 1, 2"
+    |> firstStatement
+    |> clauseColumns
+    |> Array.length
+    |> CheckEquality 2
