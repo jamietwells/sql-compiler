@@ -1,9 +1,15 @@
-namespace Library
+module SqlCompiler
 
 type ConstantValue = { Value: string }
-type Statement = { Name: string; ColumnList: ConstantValue[] }
+type Clause = { Columns: string[] }
+type SelectStatement = { Clause: Clause }
+type Statement = SelectStatement
 type CompilationResult = { Statements: Statement[] }
-
-module SqlCompiler =
-    let compile sql =
-         { Statements = Array.create 1 { Name = "SELECT"; ColumnList = Array.create 1 { Value = "1" } } }
+let compile sql =
+    { 
+        Statements = Array.create 1 {
+            Clause = {
+                Columns = Array.create 1 "1"
+            }
+        }
+    }
