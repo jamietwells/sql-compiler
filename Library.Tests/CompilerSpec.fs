@@ -125,3 +125,10 @@ let ``Selecting whitespace is a failure to compile`` () =
     "SELECT "
     |> compileWithFailure
 
+[<Fact>]
+let ``Can select column names where from a table`` () =
+    "SELECT colname FROM tablename"
+    |> compileSuccessfully
+    |> selectFirstStatement
+    |> selectClauseColumns
+    |> CheckEquality [|"colname"|]

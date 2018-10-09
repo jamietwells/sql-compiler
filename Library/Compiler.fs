@@ -18,14 +18,14 @@ let Columns sql =
         [|"1"|]
     else
         [|"1"; "2"|]
-
-let parseSql = 
-    pstring "SELECT " >>. sepBy1 pint32 (pstring ", ")
     
 let ToString a =
     a.ToString()
 
+let parseSql = 
+    pstring "SELECT " >>. ( (sepBy1 (pint32  |>> ToString) (pstring ", ")) <|> (sepBy1 (pstring "colname") (pstring ", ")) )
+
 let compile (sql: string) = 
     match run parseSql sql with 
-        | Success(result, _, _) -> Result ({ Statements =  [|{ Clause = { Columns = (result |> Array.ofList |> Array.map ToString ) }}|] })
+        | Success(result, _, _) -> Result ({ Statements =  [|{ Clause = { Columns = (result |> Array.ofList ) }}|] })
         | Failure(errorMsg, _, _) -> Fail ( errorMsg )
