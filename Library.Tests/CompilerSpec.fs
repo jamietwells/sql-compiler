@@ -10,6 +10,11 @@ let getSuccessfulResult (result: SqlCompiler.CompilationResult) =
     | (SqlCompiler.Result r) -> r
     | (SqlCompiler.Fail f) -> failwith f
 
+let getFailureResult (result: SqlCompiler.CompilationResult) =
+    match result with
+    | (SqlCompiler.Result r) -> failwith "Expected failure"
+    | (SqlCompiler.Fail f) -> f
+
 let selectFirstStatement (result: SqlCompiler.SuccessfulCompilation) =
     result.Statements
     |> Array.item 0
@@ -18,6 +23,11 @@ let compileSuccessfully sql =
     sql
     |> compile
     |> getSuccessfulResult 
+
+let compileWithFailure sql =
+    sql
+    |> compile
+    |> getFailureResult 
 
 let selectClauseColumns (result: SqlCompiler.SelectStatement) = 
     result.Clause.Columns
@@ -81,7 +91,6 @@ let ``Clause columns are correct for only one column in SELECT`` () =
     |> selectClauseColumns
     |> CheckEquality [| r |]
 
-
 [<Fact>]
 let ``Correct number of clause columns returned`` () =
     100
@@ -105,3 +114,14 @@ let ``Correct values of clause columns returned`` () =
     |> selectFirstStatement
     |> selectClauseColumns
     |> CheckEquality r
+
+[<Fact>]
+let ``Selecting nothing is a failure to compile`` () =
+    "SELECT"
+    |> compileWithFailure
+
+[<Fact>]
+let ``Selecting whitespace is a failure to compile`` () =
+    "SELECT "
+    |> compileWithFailure
+

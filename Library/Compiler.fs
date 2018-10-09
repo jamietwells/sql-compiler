@@ -20,7 +20,7 @@ let Columns sql =
         [|"1"; "2"|]
 
 let parseSql = 
-    pstring "SELECT " >>. sepBy pint32 (pstring ", ")
+    pstring "SELECT " >>. sepBy1 pint32 (pstring ", ")
     
 let ToString a =
     a.ToString()
