@@ -7,10 +7,10 @@ let compile sql =
 
 let getSuccessfulResult (result: SqlCompiler.CompilationResult) =
     match result with
-    | (SqlCompiler.Result r)  -> r
+    | (SqlCompiler.Result r) -> r
     | (SqlCompiler.Fail f) -> failwith f
 
-let firstStatement (result: SqlCompiler.SuccessfulCompilation) =
+let selectFirstStatement (result: SqlCompiler.SuccessfulCompilation) =
     result.Statements
     |> Array.item 0
 
@@ -19,7 +19,7 @@ let compileSuccessfully sql =
     |> compile
     |> getSuccessfulResult 
 
-let clauseColumns (result: SqlCompiler.SelectStatement) = 
+let selectClauseColumns (result: SqlCompiler.SelectStatement) = 
     result.Clause.Columns
 
 let CheckEquality (a: 'T) (b: 'T) =
@@ -34,10 +34,22 @@ let RandomNumbers =
     let r = System.Random()
     Seq.initInfinite (fun i -> r.Next(1, 1000))
 
+let RandomIntsAsStrings count =
+    RandomNumbers 
+    |> Seq.take count 
+    |> Array.ofSeq 
+    |> Array.map (fun n -> n.ToString())
+
+let joinTwoStrings (s1: string) s2 =
+    s1 + s2
+
 [<Fact>]
 let ``SELECT 1 returns a single statement`` () =
-    let r =  RandomNumbers |> Seq.take 1 |> Array.ofSeq |> Array.item 0
-    "SELECT " + r.ToString()
+    let r =
+        RandomIntsAsStrings 1
+        |> Array.item 0
+    r
+    |> joinTwoStrings "SELECT "
     |> compileSuccessfully 
     |> (fun a -> a. Statements)
     |> Array.length
@@ -46,30 +58,50 @@ let ``SELECT 1 returns a single statement`` () =
 [<Fact>]
 let ``SELECT 1 returns a Select Statement`` () =
     compileSuccessfully "SELECT 1"
-    |> firstStatement
+    |> selectFirstStatement
     |> Assert.IsType<SqlCompiler.SelectStatement>
 
 [<Fact>]
 let ``SELECT 1 has a single column in ColumnList`` () =
     compileSuccessfully "SELECT 1"
-    |> firstStatement
-    |> clauseColumns
+    |> selectFirstStatement
+    |> selectClauseColumns
     |> Array.length
     |> CheckEquality 1
-
+   
 [<Fact>]
-let ``SELECT 1 has a single column in the ColumnList with value 1`` () =
-    let r =  RandomNumbers |> Seq.take 1 |> Array.ofSeq |> Array.map (fun n -> n.ToString()) |> Array.item 0
-    "SELECT " + r
+let ``Clause columns are correct for only one column in SELECT`` () =
+    let r = 
+        RandomIntsAsStrings 1
+        |> Array.item 0
+    r
+    |> joinTwoStrings "SELECT "
     |> compileSuccessfully
-    |> firstStatement
-    |> clauseColumns
+    |> selectFirstStatement
+    |> selectClauseColumns
     |> CheckEquality [| r |]
 
+
 [<Fact>]
-let ``SELECT 1, 2 has a two columns in ColumnList`` () =
-    compileSuccessfully "SELECT 1, 2"
-    |> firstStatement
-    |> clauseColumns
+let ``Correct number of clause columns returned`` () =
+    100
+    |> RandomIntsAsStrings
+    |> String.concat ", "
+    |> joinTwoStrings "SELECT " 
+    |> compileSuccessfully
+    |> selectFirstStatement
+    |> selectClauseColumns
     |> Array.length
-    |> CheckEquality 2
+    |> CheckEquality 100
+
+[<Fact>]
+let ``Correct values of clause columns returned`` () =
+    let r = 
+        RandomIntsAsStrings 100
+    r
+    |> String.concat ", "
+    |> joinTwoStrings "SELECT "
+    |> compileSuccessfully 
+    |> selectFirstStatement
+    |> selectClauseColumns
+    |> CheckEquality r
