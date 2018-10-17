@@ -1,7 +1,6 @@
 module SqlCompiler
 
 open FParsec
-open System
 type ConstantValue = { Value: string }
 type Clause = { Columns: string[] }
 type SelectStatement = { Clause: Clause }
@@ -11,19 +10,14 @@ type CompilationResult =
     | Result of SuccessfulCompilation
     | Fail of string
 
-let Columns sql =
-    if 
-        "1".Equals(sql)
-    then 
-        [|"1"|]
-    else
-        [|"1"; "2"|]
-    
 let ToString a =
     a.ToString()
 
+let columnParser =
+    ( (sepBy1 (pint32  |>> ToString) (pstring ", ")) <|> (sepBy1 (many1CharsTill anyChar (pstring " ")) (pstring ", ")) )
+
 let parseSql = 
-    pstring "SELECT " >>. ( (sepBy1 (pint32  |>> ToString) (pstring ", ")) <|> (sepBy1 (pstring "colname") (pstring ", ")) )
+    pstring "SELECT " >>. columnParser
 
 let compile (sql: string) = 
     match run parseSql sql with 

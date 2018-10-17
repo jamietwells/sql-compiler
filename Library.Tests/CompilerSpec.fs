@@ -1,6 +1,8 @@
 ﻿module Tests
 
 open Xunit
+open System.Collections.Generic
+let random = System.Random()
 
 let compile sql =
     SqlCompiler.compile sql
@@ -41,14 +43,33 @@ let CheckType<'StatementType> result =
     |> ignore
 
 let RandomNumbers =
-    let r = System.Random()
-    Seq.initInfinite (fun i -> r.Next(1, 1000))
+    Seq.initInfinite (fun i -> random.Next(1, 1000))
 
 let RandomIntsAsStrings count =
     RandomNumbers 
     |> Seq.take count 
     |> Array.ofSeq 
     |> Array.map (fun n -> n.ToString())
+
+let toCommaSeparatedString items =
+    items
+    |> Array.ofSeq
+    |> Array.map (fun n -> n.ToString())
+    |> String.concat ", "
+
+let pickAtRandom (items: 'a array) =
+    items
+    |> Array.item (random.Next(0, items.Length))
+
+let randomLetter() =
+    (['a'..'z'] @ ['A'..'Z'])
+    |> Array.ofSeq
+    |> pickAtRandom
+    |> (fun c -> c.ToString())
+
+let randomWord () =
+    Seq.init (random.Next(15)) (fun i -> randomLetter())
+    |> String.concat ""
 
 let joinTwoStrings (s1: string) s2 =
     s1 + s2
@@ -127,8 +148,10 @@ let ``Selecting whitespace is a failure to compile`` () =
 
 [<Fact>]
 let ``Can select column names where from a table`` () =
-    "SELECT colname FROM tablename"
+    let colName = randomWord()
+    [|"SELECT "; colName; " FROM "; randomWord()|]
+    |> String.concat ""
     |> compileSuccessfully
     |> selectFirstStatement
     |> selectClauseColumns
-    |> CheckEquality [|"colname"|]
+    |> CheckEquality [|colName|]
