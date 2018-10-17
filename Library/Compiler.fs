@@ -14,10 +14,10 @@ let ToString a =
     a.ToString()
 
 let columnParser =
-    ( (sepBy1 (pint32  |>> ToString) (pstring ", ")) <|> (sepBy1 (many1CharsTill anyChar (pstring " ")) (pstring ", ")) )
+    ( (sepBy1 (pint32  |>> ToString) (pstring "," >>. regex "\\s*")) <|> (sepBy1 (many1CharsTill anyChar (regex "\\s+")) (pstring "," >>. regex "\\s*")) )
 
 let parseSql = 
-    pstring "SELECT " >>. columnParser
+    pstring "SELECT" >>. regex "\\s+" >>. columnParser
 
 let compile (sql: string) = 
     match run parseSql sql with 

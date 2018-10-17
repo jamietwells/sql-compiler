@@ -68,7 +68,12 @@ let randomLetter() =
     |> (fun c -> c.ToString())
 
 let randomWord () =
-    Seq.init (random.Next(15)) (fun i -> randomLetter())
+    Seq.init (random.Next(1, 15)) (fun i -> randomLetter())
+    |> String.concat ""
+
+let randomWhitespace () =
+    Seq.init (random.Next(1, 15)) (fun i -> pickAtRandom [|' '; '\t'; '\n'|])
+    |> Seq.map (fun c -> c.ToString())
     |> String.concat ""
 
 let joinTwoStrings (s1: string) s2 =
@@ -149,7 +154,7 @@ let ``Selecting whitespace is a failure to compile`` () =
 [<Fact>]
 let ``Can select column names where from a table`` () =
     let colName = randomWord()
-    [|"SELECT "; colName; " FROM "; randomWord()|]
+    [|"SELECT" ; randomWhitespace() ; colName ; randomWhitespace() ; "FROM"; randomWhitespace() ; randomWord()|]
     |> String.concat ""
     |> compileSuccessfully
     |> selectFirstStatement
