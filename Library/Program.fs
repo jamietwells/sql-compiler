@@ -359,7 +359,6 @@ let someNamedIdentifierParser = namedIdentifierParser <|> quotedIdentifierNamedP
 
 let someIdentifierParser = someNamedIdentifierParser <|> wildcardNamedParser
 
-
 let stringParser =
     pchar '\''
     >>. pManyOrNone (pCharExcept ['\''])
